@@ -9,18 +9,28 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.plasmoid 2.0
 import org.kde.plasma.components 2.0 as PlasmaComponents
 
-import org.kde.plasma.private.ipaddr 1.0
-
 
 
 Item {
     Plasmoid.preferredRepresentation: Plasmoid.fullRepresentation
 
+    property var ipAddress: ""
+
+    PlasmaCore.DataSource {
+        id: dataSource
+        engine: "executable"
+        connectedSources: ["ifconfig | grep \"inet \" | grep -Fv 127.0.0.1 | awk '{print $2}'"]
+        interval: 10000
+        onNewData: {
+            ipAddress = data.stdout.trim()
+        }
+    }
+
     Plasmoid.fullRepresentation: ColumnLayout {
         anchors.fill: parent
         PlasmaComponents.Label {
             Layout.alignment: Qt.AlignCenter
-            text: NetworkInfo.ipAddress
+            text: ipAddress
         }
     }
 }
